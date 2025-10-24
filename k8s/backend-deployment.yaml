@@ -1,0 +1,157 @@
+# AutoMERNate Backend Deployment
+# Author: Muhammad Bilal Raza Attari
+# Kubernetes Deployment for Node.js/Express Backend API
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: automernate-backend
+  namespace: default
+  labels:
+    app: automernate
+    component: backend
+    author: muhammad-bilal-raza-attari
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: automernate
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: automernate
+        component: backend
+    spec:
+      containers:
+      - name: backend
+        image: mern-ecommerce-backend:latest
+        imagePullPolicy: IfNotPresent  # For Docker Desktop Kubernetes
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: automernate-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: automernate-config
+              key: PORT
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: MONGO_URI
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: JWT_SECRET
+        - name: PAGINATION_LIMIT
+          valueFrom:
+            configMapKeyRef:
+              name: automernate-config
+              key: PAGINATION_LIMIT
+        - name: RAZORPAY_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: RAZORPAY_KEY_ID
+        - name: RAZORPAY_KEY_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: RAZORPAY_KEY_SECRET
+        - name: EMAIL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automernate-config
+              key: EMAIL_HOST
+        - name: EMAIL_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: automernate-config
+              key: EMAIL_PORT
+        - name: EMAIL_USER
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: EMAIL_USER
+        - name: EMAIL_PASS
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: EMAIL_PASS
+        - name: EMAIL_FROM
+          valueFrom:
+            configMapKeyRef:
+              name: automernate-config
+              key: EMAIL_FROM
+        volumeMounts:
+        - name: uploads-storage
+          mountPath: /app/uploads
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/products
+            port: 5000
+          initialDelaySeconds: 45
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /api/products
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+      - name: uploads-storage
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: automernate-backend-service
+  namespace: default
+  labels:
+    app: automernate
+    component: backend
+spec:
+  type: NodePort
+  selector:
+    app: automernate
+    component: backend
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 30500  # Accessible at <minikube-ip>:30500
+    protocol: TCP
+    name: http
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: default
+  labels:
+    app: automernate
+    component: backend
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi

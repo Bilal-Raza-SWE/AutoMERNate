@@ -1,0 +1,114 @@
+# AutoMERNate MongoDB Deployment
+# Author: Muhammad Bilal Raza Attari
+# Kubernetes Deployment for MongoDB Database
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: automernate-mongodb
+  namespace: default
+  labels:
+    app: automernate
+    component: database
+    author: muhammad-bilal-raza-attari
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: automernate
+      component: database
+  template:
+    metadata:
+      labels:
+        app: automernate
+        component: database
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0
+        ports:
+        - containerPort: 27017
+          name: mongodb
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: MONGO_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: MONGO_ROOT_PASSWORD
+        - name: MONGO_INITDB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: automernate-config
+              key: MONGO_DATABASE
+        volumeMounts:
+        - name: mongodb-storage
+          mountPath: /data/db
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: mongodb-storage
+        persistentVolumeClaim:
+          claimName: mongodb-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: automernate-mongodb-service
+  namespace: default
+  labels:
+    app: automernate
+    component: database
+spec:
+  type: ClusterIP
+  selector:
+    app: automernate
+    component: database
+  ports:
+  - port: 27017
+    targetPort: 27017
+    protocol: TCP
+    name: mongodb
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  namespace: default
+  labels:
+    app: automernate
+    component: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
