@@ -1,0 +1,65 @@
+# AutoMERNate Docker Ignore File
+# Author: Muhammad Bilal Raza Attari
+
+# Node modules
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Frontend specific
+frontend/node_modules
+frontend/build
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+MLOPS_ASSIGNMENT_GUIDE.md
+*.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Test coverage
+coverage
+
+# Build artifacts
+dist
+build
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Kubernetes
+k8s/
+kubernetes/
+*.yaml
+*.yml
+!package*.json
