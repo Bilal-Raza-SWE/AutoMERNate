@@ -1,0 +1,173 @@
+version: '3.8'
+
+services:
+  # Frontend Service (React + Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: automernate-frontend:dev
+    container_name: automernate-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - automernate-network
+    restart: unless-stopped
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    image: automernate-api-gateway:dev
+    container_name: automernate-api-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - API_GATEWAY_PORT=5000
+    depends_on:
+      - product-service
+      - user-service
+      - order-service
+      - payment-service
+      - notification-service
+    networks:
+      - automernate-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Product Service
+  product-service:
+    build:
+      context: ./services/product-service
+      dockerfile: Dockerfile
+    image: automernate-product:dev
+    container_name: automernate-product
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=production
+      - PRODUCT_SERVICE_PORT=5001
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - automernate-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # User Service
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    image: automernate-user:dev
+    container_name: automernate-user
+    ports:
+      - "5002:5002"
+    environment:
+      - NODE_ENV=production
+      - USER_SERVICE_PORT=5002
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - automernate-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Order Service
+  order-service:
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile
+    image: automernate-order:dev
+    container_name: automernate-order
+    ports:
+      - "5003:5003"
+    environment:
+      - NODE_ENV=production
+      - ORDER_SERVICE_PORT=5003
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - automernate-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Payment Service
+  payment-service:
+    build:
+      context: ./services/payment-service
+      dockerfile: Dockerfile
+    image: automernate-payment:dev
+    container_name: automernate-payment
+    ports:
+      - "5004:5004"
+    environment:
+      - NODE_ENV=production
+      - PAYMENT_SERVICE_PORT=5004
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+    networks:
+      - automernate-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    image: automernate-notification:dev
+    container_name: automernate-notification
+    ports:
+      - "5005:5005"
+    environment:
+      - NODE_ENV=production
+      - NOTIFICATION_SERVICE_PORT=5005
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+    networks:
+      - automernate-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  automernate-network:
+    driver: bridge

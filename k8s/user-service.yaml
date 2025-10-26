@@ -18,8 +18,8 @@ spec:
     spec:
       containers:
       - name: user-service
-        image: bilalrazaswe/automernate-user-service:latest
-        imagePullPolicy: IfNotPresent
+        image: automernate-user:dev
+        imagePullPolicy: Never
         ports:
         - containerPort: 5002
         env:

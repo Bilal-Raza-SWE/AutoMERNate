@@ -18,8 +18,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: bilalrazaswe/automernate-frontend:latest
-        imagePullPolicy: IfNotPresent
+        image: automernate-frontend:dev
+        imagePullPolicy: Never
         ports:
         - containerPort: 80
         resources:

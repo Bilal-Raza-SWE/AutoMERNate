@@ -6,7 +6,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: automernate-config
-  namespace: default
+  namespace: automernate
   labels:
     app: automernate
     author: muhammad-bilal-raza-attari

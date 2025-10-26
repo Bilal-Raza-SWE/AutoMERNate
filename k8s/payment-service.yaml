@@ -18,8 +18,8 @@ spec:
     spec:
       containers:
       - name: payment-service
-        image: bilalrazaswe/automernate-payment-service:latest
-        imagePullPolicy: IfNotPresent
+        image: automernate-payment:dev
+        imagePullPolicy: Never
         ports:
         - containerPort: 5004
         env:

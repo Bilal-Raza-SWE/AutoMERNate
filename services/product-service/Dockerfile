@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci --only=production
 
 # Copy application files
 COPY . .
@@ -14,5 +14,9 @@ COPY . .
 # Expose service port
 EXPOSE 5001
 
-# Start the service
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:5001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Start service
 CMD ["node", "server.js"]

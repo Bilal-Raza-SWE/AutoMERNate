@@ -18,8 +18,8 @@ spec:
     spec:
       containers:
       - name: order-service
-        image: bilalrazaswe/automernate-order-service:latest
-        imagePullPolicy: IfNotPresent
+        image: automernate-order:dev
+        imagePullPolicy: Never
         ports:
         - containerPort: 5003
         env:

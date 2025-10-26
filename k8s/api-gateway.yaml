@@ -18,8 +18,8 @@ spec:
     spec:
       containers:
       - name: api-gateway
-        image: bilalrazaswe/automernate-api-gateway:latest
-        imagePullPolicy: IfNotPresent
+        image: automernate-api-gateway:dev
+        imagePullPolicy: Never
         ports:
         - containerPort: 5000
         env:

@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
       - name: notification-service
-        image: automernate/notification-service:latest
+        image: automernate-notification:dev
+        imagePullPolicy: Never
         ports:
         - containerPort: 5005
         env:
