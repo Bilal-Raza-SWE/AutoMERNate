@@ -46,15 +46,11 @@ Database
 
 React SPA, User Interface
 
--
-
 **🚪 API Gateway**
 
 5000
 
 Request routing, Load balancing
-
--
 
 **📦 Product Service**
 
