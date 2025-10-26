@@ -1,0 +1,14 @@
+{
+  "name": "data-migration",
+  "version": "1.0.0",
+  "description": "Data migration script for AutoMernate microservices",
+  "main": "migrate.js",
+  "type": "module",
+  "scripts": {
+    "migrate": "node migrate.js"
+  },
+  "dependencies": {
+    "mongoose": "^8.0.0",
+    "dotenv": "^16.3.1"
+  }
+}

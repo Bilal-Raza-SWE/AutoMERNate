@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+      - name: notification-service
+        image: automernate/notification-service:latest
+        ports:
+        - containerPort: 5005
+        env:
+        - name: NOTIFICATION_SERVICE_PORT
+          value: "5005"
+        - name: EMAIL_HOST
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: email-host
+        - name: EMAIL_PORT
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: email-port
+        - name: EMAIL_USER
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: email-user
+        - name: EMAIL_PASS
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: email-pass
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+spec:
+  selector:
+    app: notification-service
+  ports:
+  - port: 5005
+    targetPort: 5005
+  type: ClusterIP

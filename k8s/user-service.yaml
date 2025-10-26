@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+        tier: backend
+    spec:
+      containers:
+      - name: user-service
+        image: bilalrazaswe/automernate-user-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5002
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: USER_SERVICE_PORT
+          value: "5002"
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: mongo-uri
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: automernate-secret
+              key: jwt-secret
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+spec:
+  type: NodePort
+  selector:
+    app: user-service
+  ports:
+  - port: 5002
+    targetPort: 5002
+    nodePort: 30002
+    protocol: TCP

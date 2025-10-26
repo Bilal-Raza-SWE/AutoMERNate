@@ -1,0 +1,13 @@
+﻿{
+    "service":  "API Gateway",
+    "status":  "healthy",
+    "port":  "5000",
+    "timestamp":  "2025-10-26T10:35:55.917Z",
+    "routes":  {
+                   "products":  "http://localhost:5001",
+                   "users":  "http://localhost:5002",
+                   "orders":  "http://localhost:5003",
+                   "payment":  "http://localhost:5004",
+                   "notifications":  "http://localhost:5005"
+               }
+}
